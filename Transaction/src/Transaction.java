@@ -56,7 +56,7 @@ class Transaction {
         con.close();
         
         } catch (SQLException e){
-            System.out.println(e.getErrorCode());
+            System.out.println(e.getMessage());
         }
         
     }
