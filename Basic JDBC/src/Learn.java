@@ -5,7 +5,7 @@ class Learn {
 
     public static final String url = "jdbc:mysql://localhost:3306/jaydip115";
     public static final String userName = "root";
-    public static final String password = "@Jedy.614";
+    public static final String password = "";
     public static void main(String[] args) {
 
         try{
