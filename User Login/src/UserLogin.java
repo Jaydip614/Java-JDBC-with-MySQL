@@ -10,7 +10,7 @@ class UserLogin {
 
     private static String url = "jdbc:mysql://localhost:3306/jaydip115";
     private static String userName = "root";
-    private static String password = "";
+    private static String password = "@Jedy.614";
     public static void main(String[] args) {
 
         try{
@@ -26,6 +26,7 @@ class UserLogin {
         System.out.println("\nWelcome to Gec Gandhinagar\n");
         System.out.println("1.Create New Account");
         System.out.println("2.Login");
+        System.out.println("3.Delete");
 
         System.out.print("Enter your choice (1/2): ");
         int choice = sc.nextInt();
@@ -34,6 +35,8 @@ class UserLogin {
             case 1: Create_Account(con);
                     break;
             case 2: Login(con);
+                    break;
+            case 3: Delete(con);
                     break;       
         
             default:
@@ -50,7 +53,6 @@ class UserLogin {
     private static void Create_Account(Connection con){
     
         try{
-        con.setAutoCommit(false);
         Scanner sc = new Scanner(System.in);    
         String create_query = "INSERT INTO login_data (email, user_name, password) VALUES (?, ?, ?)";
         String fetch_email = "SELECT  email FROM login_data WHERE email = ?";
@@ -95,7 +97,6 @@ class UserLogin {
         user_pst.close();
         email_pst.close();
         create_pst.close();
-        con.close();
         }catch(SQLException e){
             System.out.println(e.getMessage());
         }
@@ -122,22 +123,18 @@ class UserLogin {
         if(credential.next()){
             String Username = credential.getString("user_name");
             String Password = credential.getString("password");
-
             // System.out.println("Username: "+Username+" Password: "+Password);
 
             if(Objects.equals(Username, user_name) && Objects.equals(password, Password)){
 
                 System.out.println("\nLogin Successfull\n");
-                con.rollback();
             }
             else{
                 System.out.println("\nInvalid password!\n");
-                con.rollback();
             }    
         }
         else{
             System.out.println("\nYour account is not craeted\n");
-            con.commit();
         }
 
         sc.close();
@@ -146,5 +143,58 @@ class UserLogin {
             System.out.println(e.getMessage());
         }
 
+    }
+
+    private static void Delete (Connection con){
+
+        try{
+        con.setAutoCommit(false);
+        Scanner sc = new Scanner(System.in);
+
+        String delete_query = "DELETE FROM login_data WHERE user_name = ?";
+        String fetch_account = "SELECT user_name,password FROM login_data WHERE user_name = ?";
+
+        PreparedStatement delete_pst =  con.prepareStatement(delete_query);
+        PreparedStatement fetch_pst = con.prepareStatement(fetch_account);
+
+        System.out.println("\nDelete your Account\n");
+        System.out.print("Enter Username: ");
+        String user_name = sc.next();
+        System.out.print("Enter password: ");
+        String password = sc.next();
+
+        delete_pst.setString(1, user_name);
+        fetch_pst.setString(1, user_name);
+
+        ResultSet credential = fetch_pst.executeQuery();
+        
+
+        if(credential.next()){
+            int affectedRows = delete_pst.executeUpdate();
+
+            String UserName = credential.getString("user_name");
+            String Password = credential.getString("password");
+
+            if(Objects.equals(UserName, user_name) && Objects.equals(Password, password)){
+
+                if(affectedRows == 1){
+                System.out.println("\nAccount deleted Successfully\n");
+                con.commit();
+                }
+            }
+            else{
+                System.out.println("\nInvalid Username and Password");
+                con.rollback();
+            }
+
+        }
+    
+        fetch_pst.close();
+        delete_pst.close();
+        sc.close();
+        con.close();
+        } catch (SQLException e){
+            System.out.println(e.getMessage());
+        }
     }
 }

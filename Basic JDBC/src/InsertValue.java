@@ -5,7 +5,7 @@ class InsertValue {
 
     public static final String url = "jdbc:mysql://localhost:3306/jaydip115";
     public static final String userName = "root";
-    public static final String password = "";
+    public static final String password = "@";
     public static void main(String[] args) {
 
         try{
@@ -17,7 +17,7 @@ class InsertValue {
         try{
         Connection con = DriverManager.getConnection(url, userName, password);
         Statement st = con.createStatement();
-        String query = String.format("INSERT INTO students(name, age, marks) VALUES ('%s', %o, %f)","Akash", 20, 92.5);
+        String query = String.format("INSERT INTO students(name, age, marks) VALUES ('%s', %d, %f)","Akash", 20, 92.5);
 
         int affectedRow = st.executeUpdate(query);
 
@@ -31,7 +31,7 @@ class InsertValue {
         con.close();
 
         } catch (SQLException e){
-            System.out.println(e.getErrorCode());
+            e.printStackTrace();
         }
         
     }
