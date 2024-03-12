@@ -1,9 +1,6 @@
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Objects;
 import java.util.Scanner;
 
 class UserLogin {
@@ -32,11 +29,11 @@ class UserLogin {
         int choice = sc.nextInt();
 
         switch (choice) {
-            case 1: Create_Account(con);
+            case 1: Create.create_Account(con);
                     break;
-            case 2: Login(con);
+            case 2: Login.login(con);
                     break;
-            case 3: Delete(con);
+            case 3: Delete.delete(con);
                     break;       
         
             default:
@@ -49,152 +46,5 @@ class UserLogin {
             System.out.println(e.getMessage());
         }
     }
-
-    private static void Create_Account(Connection con){
-    
-        try{
-        Scanner sc = new Scanner(System.in);    
-        String create_query = "INSERT INTO login_data (email, user_name, password) VALUES (?, ?, ?)";
-        String fetch_email = "SELECT  email FROM login_data WHERE email = ?";
-        String fetch_user = "SELECT user_name FROM login_data WHERE user_name = ?";
-
-        PreparedStatement create_pst = con.prepareStatement(create_query);
-        PreparedStatement email_pst = con.prepareStatement(fetch_email);
-        PreparedStatement user_pst = con.prepareStatement(fetch_user);
-
-
-        System.out.println("\nCreate New Account\n");
-        System.out.print("Enter Email ID: ");
-        String email = sc.next();
-        System.out.print("Enter UserName: ");
-        String user_name = sc.next();
-        System.out.print("Enter Password: ");
-        String password = sc.next();
-
-        create_pst.setString(1, email);
-        create_pst.setString(2, user_name);
-        create_pst.setString(3, password);
-
-        email_pst.setString(1, email);
-        user_pst.setString(1, user_name);
-
-        ResultSet email_exist = email_pst.executeQuery();
-        ResultSet user_exist = user_pst.executeQuery();
-        int affectedRows = create_pst.executeUpdate();
-
-        if(email_exist.next()){
-            System.out.println("\n"+email+" is already exists\n");
-        }
-        else if(user_exist.next()){
-            System.out.println("\n"+user_name+" is taken by someone! Try onther Username\n");
-        }
-        else if(affectedRows>0){
-            System.out.println("\nYour Account is created successfully\n");
-        }
-
-        
-        sc.close();
-        user_pst.close();
-        email_pst.close();
-        create_pst.close();
-        }catch(SQLException e){
-            System.out.println(e.getMessage());
-        }
-    }
-
-    private static void Login (Connection con){
-
-        try{
-        Scanner sc = new Scanner(System.in);    
-        String login_query = "SELECT user_name,password FROM login_data WHERE user_name = ?";
-        PreparedStatement login_pst = con.prepareStatement(login_query);
-
-        System.out.println("\nLogin into your Account\n");
-        System.out.print("Enter Username: ");
-        String user_name = sc.next();
-        System.out.print("Enter password: ");
-        String password = sc.next();
-
-        login_pst.setString(1, user_name);
-
-    
-        ResultSet credential = login_pst.executeQuery();
-
-        if(credential.next()){
-            String Username = credential.getString("user_name");
-            String Password = credential.getString("password");
-            // System.out.println("Username: "+Username+" Password: "+Password);
-
-            if(Objects.equals(Username, user_name) && Objects.equals(password, Password)){
-
-                System.out.println("\nLogin Successfull\n");
-            }
-            else{
-                System.out.println("\nInvalid password!\n");
-            }    
-        }
-        else{
-            System.out.println("\nYour account is not craeted\n");
-        }
-
-        sc.close();
-        con.close();
-        } catch (SQLException e){
-            System.out.println(e.getMessage());
-        }
-
-    }
-
-    private static void Delete (Connection con){
-
-        try{
-        con.setAutoCommit(false);
-        Scanner sc = new Scanner(System.in);
-
-        String delete_query = "DELETE FROM login_data WHERE user_name = ?";
-        String fetch_account = "SELECT user_name,password FROM login_data WHERE user_name = ?";
-
-        PreparedStatement delete_pst =  con.prepareStatement(delete_query);
-        PreparedStatement fetch_pst = con.prepareStatement(fetch_account);
-
-        System.out.println("\nDelete your Account\n");
-        System.out.print("Enter Username: ");
-        String user_name = sc.next();
-        System.out.print("Enter password: ");
-        String password = sc.next();
-
-        delete_pst.setString(1, user_name);
-        fetch_pst.setString(1, user_name);
-
-        ResultSet credential = fetch_pst.executeQuery();
-        
-
-        if(credential.next()){
-            int affectedRows = delete_pst.executeUpdate();
-
-            String UserName = credential.getString("user_name");
-            String Password = credential.getString("password");
-
-            if(Objects.equals(UserName, user_name) && Objects.equals(Password, password)){
-
-                if(affectedRows == 1){
-                System.out.println("\nAccount deleted Successfully\n");
-                con.commit();
-                }
-            }
-            else{
-                System.out.println("\nInvalid Username and Password");
-                con.rollback();
-            }
-
-        }
-    
-        fetch_pst.close();
-        delete_pst.close();
-        sc.close();
-        con.close();
-        } catch (SQLException e){
-            System.out.println(e.getMessage());
-        }
-    }
+   
 }
